@@ -1,0 +1,23 @@
+sudo: required
+
+env:
+  - DOCKERHUB_IMAGE: $DOCKERHUB_USERNAME/5sec_worker:latest
+
+language: node_js
+node_js:
+  - "6"
+
+services:
+  - docker
+
+script:
+  - echo "run using $TRAVIS_BRANCH"
+  - docker build --tag $DOCKERHUB_IMAGE .
+  - docker run -it --rm $DOCKERHUB_IMAGE
+
+after_success:
+  - echo "success ($TRAVIS_BRANCH)"
+  - if [ "$TRAVIS_BRANCH" == "master" ]; then
+      docker login --username="$DOCKERHUB_USERNAME" --password="$DOCKERHUB_PASSWORD";
+      docker push $DOCKERHUB_IMAGE;
+    fi
